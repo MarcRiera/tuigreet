@@ -37,14 +37,17 @@ You may change the command that will be executed after opening a session by hitt
 
 ## Install
 
+Only releases from this repository and AUR packages are maintained officially here, packages for other distributions may not be up to date.
+
 ### From source
 
-Building from source requires an installation of Rust's `stable` toolchain, including `cargo`.
+Building from source requires an installation of Rust's `stable` toolchain, including `cargo`. The `CAP_SYS_BOOT` is necessary for using the `reboot` syscall in order to perform power actions (shutdown, reboot, etc.).
 
 ```
 $ git clone https://github.com/apognu/tuigreet && cd tuigreet
 $ cargo build --release
 # mv target/release/tuigreet /usr/local/bin/tuigreet
+# setcap cap_sys_boot+ep /usr/local/bin/tuigreet
 ```
 
 ### From AUR

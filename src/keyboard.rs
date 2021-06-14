@@ -1,7 +1,7 @@
 use std::error::Error;
 
 use greetd_ipc::Request;
-use system_shutdown::{reboot, shutdown};
+use nix::sys::reboot::{reboot, RebootMode};
 use termion::event::Key;
 
 use crate::{
@@ -128,10 +128,14 @@ pub fn handle(greeter: &mut Greeter, events: &Events) -> Result<(), Box<dyn Erro
         }
 
         Mode::Power => {
-          let _ = match POWER_OPTIONS[greeter.selected_power_option] {
-            (PowerOption::Shutdown, _) => shutdown(),
-            (PowerOption::Reboot, _) => reboot(),
+          let result = match POWER_OPTIONS[greeter.selected_power_option] {
+            (PowerOption::Shutdown, _) => reboot(RebootMode::RB_AUTOBOOT),
+            (PowerOption::Reboot, _) => reboot(RebootMode::RB_POWER_OFF),
           };
+
+          if let Err(err) = result {
+            greeter.message = Some(format!("Failed to perform power action: {}", err));
+          }
 
           greeter.mode = greeter.previous_mode;
         }
